@@ -1,0 +1,1 @@
+# colectacom para registro espacial
