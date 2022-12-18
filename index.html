@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Visor</title>
+    <link rel="stylesheet" href="css/leaflet.css">
+    <script src="js/leaflet.js"></script>
+    <script type="text/javascript" src="js/Leaflet.Coordinates-0.1.5.min.js"></script>
+    <link rel="stylesheet" href="css/Leaflet.Coordinates-0.1.5.css" />
+    <link rel="stylesheet" href="webfonts/font-awesome/css/font-awesome.min.css">
+    <script src="js/jquery-3.6.0.min.js"></script>
+
+    <link rel="stylesheet" href="css/leafletDraw.css" />
+    <script src="js/leaflet.draw.js"></script>
+
+    <link rel="stylesheet" href="css/Control.Coordinates.css" />
+    <script src="js/Control.Coordinates.js"></script>
+
+
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/animate.css" />
+
+</head>
+
+<body>
+
+
+
+
+
+
+    <div class="container animated fadeInLeft" id="container">
+        <h1>¿Desea efectuar el Registro Espacial del lugar de interés?</h1>
+        <p>La informacion se guardara en la base de datos </p>
+        <div class="form">
+
+            <div class="group">
+                <p class="label2" for="">Nombre del objeto espacial</p>
+                <input class="camp" type="text" placeholder="Descripción" id="text">
+            </div>
+
+
+
+            <div class="group">
+                <p class="label2" style="flex-wrap: nowrap;" for="">Latitud&nbsp;(N):</p>
+                <input class="camp" type="text" placeholder="" id="ltdForm">
+            </div>
+
+            <div class="group">
+                <p class="label2" style="flex-wrap: nowrap;" for="">Longitud&nbsp;(W):</p>
+                <input class="camp" type="text" placeholder="" id="lngForm">
+            </div>
+        </div>
+        <details>
+            <summary>
+                <div class="button redButton" onclick="cerrarVentana('0')">Cancelar</div>
+                <div class="button greenButton" onclick="cerrarVentana('1')">Guardar</div>
+
+                <div class="details-modal-overlay"></div>
+            </summary>
+        </details>
+    </div> <!-- Eso es nuevo, es el html con el formulario de registro -->
+
+
+
+
+
+
+    <div id="map">
+        <!-- div con id map -->
+    </div>
+
+    <script src="js/labels.js"></script>
+
+    <script>
+
+        /*========================================================
+        CREAMOS EL MAPA Y AGREGAMOS LOS BASE LAYERS Y UN MARCADOR     SECCION 1 
+        =========================================================*/
+
+        var map = new L.Map('map', { // esta clasa crea el visor del mapa y lo imprime en el div con id *map*
+            minZoom: 1, // se establece un rango de zoom
+            maxZoom: 28 // se establece un rango de zoom
+        });
+
+        map.setView([7.6655, -64.5883], 6, false); // se mueve la vista del mapa a las coordenas especificadas y a un zoom de 6
+
+        map.attributionControl.setPrefix(''); // Agrega quita el div de *attribution*. Si lo quita se agregara un enlace a LEAFLET abajo a la derecha  
+
+        L.control.coordinates().addTo(map); // agrega las coordenadas del cursor abajo a la derecha
+
+        googleSat = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+            maxZoom: 28,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+        }).addTo(map); // Cargamos la imagen satelital de google
+
+        /* Note que algunos bloques de codigo terminan con .addTo(map) - Esto agrega el objeto creado al mapa*/
+
+        googleStreets = L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+            maxZoom: 28,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+        }); //  googleStreets.addTo(map);
+
+        var CartoDB_DarkMatter = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '',
+            subdomains: 'abcd',
+            maxZoom: 28
+        }); //  CartoDB_DarkMatter.addTo(map);
+
+
+        /*========================================================
+        CREAMOS EL MAPA Y AGREGAMOS LOS BASE LAYERS Y UN MARCADOR      
+        =========================================================*/
+
+
+
+
+
+
+
+
+
+        var c = new L.Control.Coordinates2(); // llamo a la clase encargada de capturar las coordenadas
+        c.addTo(map); // la agrego al mapa
+        map.on('dblclick', function (e) {
+            c.setCoordinates(e);
+        }); // llamo al metodo setCoordinates (liena 68 del archivo mencionado abajo) que es el encargado de mostrar la ventana del formulario y escribir las coordenadas en los input's - #(creo que a eso se referia cuando dijo 'textbox')
+
+        // puede encontrar el archivo encargado de todo en js/Control.Coordinates.js
+
+
+
+
+
+        function cerrarVentana(params) {
+        
+
+
+            if($('#text').val() != ''){
+
+
+        $('.container').hide() // se oculta el div .container definido arriba en el html
+
+        setTimeout(() => {
+            if (params == 1) {
+                alert('Registro Espacial realizado exitosamente en la Base de Datos')
+            }else{
+                alert('Cancelado')
+            } 
+        },1000); // con un retraso de un segundo (1000 milesimas), se muestra un alert con el texto correspondiente
+        
+    }else{
+        alert('indique el nombre del objeto espacial')
+
+    }
+
+
+
+
+       
+        } // lo que ocurre al pulsar los botones 'Cancelar' y 'Guardar'
+
+
+
+
+
+
+
+
+        /*-------------------------------------------------*/
+
+
+
+
+        /*========================================================
+                CONFIGURAMOS LA HERRAMIENTA DE DIBUJO           SECCION 2
+        =========================================================*/
+        /*  El siguiente plugin se usa para crear geometrias sobre el mapa, lo simplifique los mas que pude*/
+
+
+        var drawnItems = new L.FeatureGroup(); // aqui creo el grupo en donde se almacenara las geometrias creadas
+        map.addLayer(drawnItems); // con addLayeer agrego el grupo *drawnItems* creado en la linea anterior. (se agrega al mapa)
+
+
+
+
+        var drawControl = new L.Control.Draw({ // creo el control *DRAW* con la opciones de creacion de geometria
+            draw: {
+                polygon: true, // se indican las opciones disponibles, en la documentacion del plugin estan todos los tipos de geometrias con los que se pueden trabajar
+                polyline: true, // // //
+                circle: true, // // //
+                rectangle: true // // //
+
+            },
+            edit: {
+                featureGroup: drawnItems, //// le indico el grupo al cual ira a parar todo lo dibujado
+            },
+        });
+
+
+        map.addControl(drawControl); // agrego al map el control *DRAW*
+
+
+
+
+
+
+
+        map.on('draw:created', function (event) {
+
+            if (JSON.stringify(drawnItems.toGeoJSON()) != '{"type":"FeatureCollection","features":[]}') {
+                drawnItems.clearLayers()
+            }
+
+            var layer = event.layer,
+                feature = layer.feature = layer.feature || {};
+
+            feature.type = feature.type || "Feature";
+            var props = feature.properties = feature.properties || {};
+            drawnItems.addLayer(layer);
+            var drawJson = (JSON.stringify(drawnItems.toGeoJSON()));
+
+
+            alert(drawJson) // el objeto *drawJson* es que almacenariamos en la base de datos, aqui se encuentran la propiedades y coordenadas
+
+        });
+
+        /*========================================================
+                CONFIGURAMOS LA HERRAMIENTA DE DIBUJO           SECCION 3
+        =========================================================*/
+
+
+
+        /* --------------------------------------------------------*/
+
+
+
+
+
+
+
+        /*========================================================
+                CREAMOS EL ADMINISTRADOR DE CAPAS   
+        =========================================================*/
+        var baseLayers = {
+            '<img width="13px" src="legend/raster-icon.png" /> Satelite': googleSat,
+            '<img width="13px" src="legend/raster-icon.png" /> Google Maps': googleStreets,
+            '<img width="13px" src="legend/raster-icon.png" /> Carto DB': CartoDB_DarkMatter
+        }; // creo un obejto con todos los *layers*
+
+        //'<img width="13px" src="legend/descargar.png" width="10px"/> Edificios y casas': osmb,
+
+        var controlP = L.control.layers(baseLayers, {
+            ' &nbsp;&nbsp;&nbsp; Geometrias creadas': drawnItems
+
+        }).addTo(map); // mi administrador de capas, agrego el objeto baseLayers y el grupo *draw*
+
+
+
+
+
+    </script>
+</body>
+
+</html>
